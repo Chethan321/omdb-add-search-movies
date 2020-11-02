@@ -9,13 +9,19 @@ import {
   CardTitle,
   Row,
   Col,
-  Button
+  Button,
+  CardFooter
 } from 'reactstrap'
 import SearchSection from './components/SearchSection'
 import AddMovie from './components/AddMovie'
+import UpdateMovie from './components/updateMovie'
+
+import "./styles.css"
+
 
 export default function App () {
-  const [data, setData] = useState({})
+  const [data, setData] = useState({});
+  const [editId, setEditId] = useState(null)
   const [searchValue, setSearchValue] = useState('')
 
   function onChangeSearchValue (event) {
@@ -41,6 +47,27 @@ export default function App () {
       .catch(error => console.log('error', error))
   }
 
+  function deleteMovie(imbdID){
+    const confirm = window.confirm("Are you sure you want to delete the movie ?");
+
+    if(confirm){
+      fetch(`http://localhost:5000/delete`,{
+
+      method:"DELETE",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body:  JSON.stringify({imbdID})
+      })
+      .then(response => response.json())
+      .then(result => {
+        setData(data.filter(movie => movie.imdbID !== imbdID))
+      
+        alert(result.message)})
+      .catch(error => console.log('error', error))
+    }
+  }
+
   return (
     <Container style={{ marginTop: '60px' }}>
       <SearchSection
@@ -52,11 +79,11 @@ export default function App () {
       <br />
       <section className='movies-section'>
         <Row>
-          {data &&
+          {data.length > 0 &&
             data.length &&
             data.map(movie => {
               return (
-                <Col md={3} key={movie.imdbID}>
+                <Col md={2} key={movie.imdbID}>
                   <Card>
                     <CardImg
                       top
@@ -69,12 +96,28 @@ export default function App () {
                       <CardText>
                         {movie.year}-{movie.type}
                       </CardText>
+
+                      <div className= "buttons">
                       <Link
                         to={`/booking-page/${movie.imdbID}`}
                         className='btn btn-primary'
                       >
                         Book Now
-                      </Link>
+                      </Link> 
+                      <button
+                      
+                        className='btn btn-danger'
+                        onClick={()=>deleteMovie(movie.imdbID)}
+                      >
+                        delete 
+                      </button> 
+                      <button
+                       onClick={()=>setEditId(movie.imdbID)}
+                        className='btn btn-success'
+                      >
+                        update 
+                      </button>
+                      </div>
                     </CardBody>
                   </Card>
                 </Col>
@@ -82,6 +125,10 @@ export default function App () {
             })}
         </Row>
       </section>
+
+      {editId &&
+        <UpdateMovie data={data[0]} cancel={setEditId}/>
+      }
     </Container>
   )
 }

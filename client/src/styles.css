@@ -2,3 +2,25 @@
   font-family: sans-serif;
   text-align: center;
 }
+
+.buttons
+{
+  display:flex;
+  widows: 100px;
+}
+
+.section
+{
+
+  background-color: darkgray;
+}
+
+.card{ 
+  width: 202px !important;
+  background-color: grey !important;
+}
+
+.buttons {
+  display: flex !important;
+  flex-direction: column !important;
+}
